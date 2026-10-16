@@ -1,0 +1,841 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ریاضی‌یار</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: a rounded hero, a wrapping row of colour-coded topic chips, then one panel of live solver cards per topic. Each topic owns one colour. */
+:root{
+  --bg:#f4f5fc; --surface:#ffffff; --surface2:#eef0fa; --fg:#1a1d3b; --muted:#585e83; --line:#dde0f1; --on-c:#ffffff; --err:#b42318;
+  --c-arith:#d9363e; --c-alg:#b45309; --c-geo:#047857; --c-trig:#0369a1; --c-stat:#7c3aed; --c-calc:#db2777; --c-comb:#0f766e;
+  --shadow:0 1px 2px rgba(26,29,59,.06),0 10px 28px rgba(26,29,59,.07);
+  --font-display:'Lalezar','Vazirmatn',Tahoma,system-ui,sans-serif;
+  --font-body:'Vazirmatn',Tahoma,system-ui,'Segoe UI',sans-serif;
+  --font-mono:ui-monospace,'Cascadia Mono',Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1023; --surface:#171a35; --surface2:#1f2343; --fg:#eceefc; --muted:#a4aacd; --line:#2b3058; --on-c:#0e1023; --err:#ff9b92;
+    --c-arith:#ff7a80; --c-alg:#fbbf24; --c-geo:#34d399; --c-trig:#38bdf8; --c-stat:#a78bfa; --c-calc:#f472b6; --c-comb:#2dd4bf;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1023; --surface:#171a35; --surface2:#1f2343; --fg:#eceefc; --muted:#a4aacd; --line:#2b3058; --on-c:#0e1023; --err:#ff9b92;
+  --c-arith:#ff7a80; --c-alg:#fbbf24; --c-geo:#34d399; --c-trig:#38bdf8; --c-stat:#a78bfa; --c-calc:#f472b6; --c-comb:#2dd4bf;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.t-arith{--c:var(--c-arith)} .t-alg{--c:var(--c-alg)} .t-geo{--c:var(--c-geo)} .t-trig{--c:var(--c-trig)}
+.t-stat{--c:var(--c-stat)} .t-calc{--c:var(--c-calc)} .t-comb{--c:var(--c-comb)}
+.page{max-width:1080px;margin:0 auto;padding-block:20px 40px}
+
+.hero{position:relative;overflow:hidden;border-radius:28px;padding:30px 26px 24px;background:var(--surface);box-shadow:var(--shadow);border:1px solid var(--line)}
+.hero>*{position:relative;z-index:1}
+.glyph{position:absolute!important;z-index:0!important;font-family:var(--font-display);line-height:1;opacity:.17;pointer-events:none;user-select:none}
+.g1{left:4%;top:-6px;font-size:120px;color:var(--c-stat)}
+.g2{left:22%;bottom:-18px;font-size:110px;color:var(--c-calc)}
+.g3{left:38%;top:6px;font-size:70px;color:var(--c-trig)}
+.g4{left:11%;bottom:6px;font-size:64px;color:var(--c-arith)}
+.g5{left:50%;bottom:-8px;font-size:84px;color:var(--c-alg)}
+.kicker{margin:0;color:var(--muted);font-weight:500}
+.hero h1{font-family:var(--font-display);font-weight:400;font-size:clamp(40px,9vw,68px);line-height:1.15;margin:2px 0 6px;text-wrap:balance}
+.lead{margin:0;max-width:52ch;color:var(--muted);font-size:16px}
+.credit{margin:14px 0 0;color:var(--muted);font-size:14px}
+.credit b{color:var(--fg);font-weight:800}
+.spectrum{display:flex;height:7px;border-radius:99px;overflow:hidden;margin-top:20px}
+.spectrum i{flex:1}
+
+.tabs{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 20px}
+.tab{
+  appearance:none;border:1.5px solid color-mix(in srgb,var(--c) 38%,var(--line));background:var(--surface);color:var(--fg);
+  font:inherit;font-weight:700;padding:6px 16px 6px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:9px;cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s,transform .15s;
+}
+.tab:hover{transform:translateY(-2px)}
+.tab .g{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:color-mix(in srgb,var(--c) 17%,transparent);color:var(--c);font-family:var(--font-display);font-weight:400;font-size:18px;line-height:1;padding-bottom:2px}
+.tab[aria-selected="true"]{background:var(--c);border-color:var(--c);color:var(--on-c)}
+.tab[aria-selected="true"] .g{background:color-mix(in srgb,var(--on-c) 22%,transparent);color:var(--on-c)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid color-mix(in srgb,var(--c,var(--fg)) 55%,transparent);outline-offset:2px}
+
+.phead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.phead .big{flex:none;display:grid;place-items:center;width:54px;height:54px;border-radius:18px;background:var(--c);color:var(--on-c);font-family:var(--font-display);font-size:32px;line-height:1;padding-bottom:4px}
+.phead h2{margin:0;font-family:var(--font-display);font-weight:400;font-size:30px;line-height:1.2;color:var(--c)}
+.phead p{margin:0;color:var(--muted)}
+
+.panel{animation:rise .24s ease-out}
+@keyframes rise{from{transform:translateY(8px)}to{transform:none}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px}
+.wide{grid-column:1/-1}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.card h3{margin:0 0 4px;font-size:17px;font-weight:800;color:var(--c)}
+.hint{margin:0 0 12px;color:var(--muted);font-size:13px}
+.sub{margin:8px 0 0;color:var(--muted);font-size:14px}
+
+input,select{font:inherit;color:var(--fg);background:var(--surface2);border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;min-width:0;width:100%}
+input:focus-visible,select:focus-visible{border-color:var(--c)}
+.ltr{direction:ltr;text-align:left;font-family:var(--font-mono);font-size:15px}
+.big{font-size:18px}
+.calc-row{display:grid;grid-template-columns:1fr 110px;gap:10px}
+.frow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:6px}
+.fld{display:grid;gap:3px;min-width:0}
+.fld label{font-size:13px;color:var(--muted);font-weight:500}
+.eq{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;direction:ltr;font-family:var(--font-mono);font-size:17px;margin:6px 0}
+.eq input{width:78px;text-align:center;direction:ltr;padding:8px 6px}
+.eq.tight input{width:68px}
+
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:8px;margin-top:10px}
+.keys button,.chips button{
+  appearance:none;font:inherit;font-weight:700;color:var(--fg);background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:7px 0;cursor:pointer;direction:ltr;
+  transition:background .12s,transform .12s;
+}
+.keys button:hover,.chips button:hover{background:color-mix(in srgb,var(--c) 16%,var(--surface2))}
+.keys button:active,.chips button:active{transform:scale(.95)}
+.keys button.op{color:var(--c)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips button{padding:4px 12px;border-radius:999px;font-size:13px}
+
+.res{background:color-mix(in srgb,var(--c) 9%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));border-radius:14px;padding:12px 14px;margin-top:12px;min-height:48px}
+.ans{font-size:20px;font-weight:800;color:color-mix(in srgb,var(--c) 78%,var(--fg));line-height:1.7}
+.m{direction:ltr;unicode-bidi:isolate;display:inline-block;font-variant-numeric:tabular-nums}
+.steps{margin:8px 0 0;padding-inline-start:26px;list-style-type:persian}
+.steps li{margin:4px 0}
+.steps li::marker{color:var(--c);font-weight:800}
+.err{color:var(--err);font-weight:500}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:10px}
+.kv>div{background:var(--surface);border:1px solid color-mix(in srgb,var(--c) 18%,var(--line));border-radius:12px;padding:8px 12px;min-width:0}
+.kv small{display:block;color:var(--muted);font-size:12px;line-height:1.5}
+.kv b{font-size:17px;font-weight:800;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tags span{background:color-mix(in srgb,var(--c) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 28%,var(--line));padding:2px 12px;border-radius:999px;font-weight:700;direction:ltr;font-variant-numeric:tabular-nums}
+.plot{width:100%;height:auto;display:block;direction:ltr;margin-top:12px;border-radius:14px;background:var(--surface2);border:1px solid var(--line)}
+.plot .tx{fill:var(--muted);font-size:11px;font-family:var(--font-body)}
+.plot .gl{stroke:var(--line);stroke-width:1}
+.plot .ax{stroke:var(--muted);stroke-width:1.3}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:640px){.split{grid-template-columns:minmax(0,1fr)}}
+.foot{margin-top:28px;text-align:center;color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}.tab,.keys button,.chips button{transition:none}}
+</style>
+
+<div class="page" dir="rtl" lang="fa">
+  <header class="hero">
+    <span class="glyph g1" aria-hidden="true">∑</span>
+    <span class="glyph g2" aria-hidden="true">∫</span>
+    <span class="glyph g3" aria-hidden="true">π</span>
+    <span class="glyph g4" aria-hidden="true">√</span>
+    <span class="glyph g5" aria-hidden="true">÷</span>
+    <p class="kicker">حل مسئله‌های ریاضی، قدم‌به‌قدم</p>
+    <h1>ریاضی‌یار</h1>
+    <p class="lead">یک بخش را انتخاب کنید، عددها را بنویسید و همان لحظه جواب را همراه با مراحل حل ببینید.</p>
+    <p class="credit">طراح: <b>صدرا فرح‌بخشیان</b></p>
+    <div class="spectrum" aria-hidden="true">
+      <i style="background:var(--c-arith)"></i><i style="background:var(--c-alg)"></i><i style="background:var(--c-geo)"></i><i style="background:var(--c-trig)"></i><i style="background:var(--c-stat)"></i><i style="background:var(--c-calc)"></i><i style="background:var(--c-comb)"></i>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs" aria-label="بخش‌های ریاضی"></div>
+  <div class="phead" id="phead"></div>
+
+  <main>
+    <!-- حساب -->
+    <section id="p-arith" class="panel t-arith" hidden>
+      <div class="grid">
+        <article class="card wide">
+          <h3>ماشین‌حساب عبارت</h3>
+          <p class="hint">عبارت کامل را بنویسید. پشتیبانی از + − × ÷ ^ √ ! % و پرانتز، توابع sin cos tan log ln sqrt و ثابت‌های pi و e. اعداد فارسی هم قبول است.</p>
+          <div class="calc-row">
+            <input id="ex" class="ltr big" value="2*(3+4)^2 - sqrt(16)" autocomplete="off" spellcheck="false" aria-label="عبارت ریاضی">
+            <select id="angle" aria-label="واحد زاویه"><option value="1">درجه</option><option value="0">رادیان</option></select>
+          </div>
+          <div class="keys" id="keys"></div>
+          <div class="res" id="ex-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <h3>درصد</h3>
+          <p class="hint">سه نوع مسئلهٔ درصد را انتخاب کنید.</p>
+          <div class="fld" style="margin-bottom:10px"><label for="pm">نوع مسئله</label>
+            <select id="pm"><option value="1">x درصدِ y چقدر است؟</option><option value="2">x چند درصدِ y است؟</option><option value="3">درصد تغییر از x به y</option></select></div>
+          <div class="frow">
+            <div class="fld"><label for="pa">x</label><input id="pa" class="ltr" value="15" inputmode="decimal" autocomplete="off"></div>
+            <div class="fld"><label for="pb">y</label><input id="pb" class="ltr" value="240" inputmode="decimal" autocomplete="off"></div>
+          </div>
+          <div class="res" id="pct-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <h3>ب.م.م و ک.م.م</h3>
+          <p class="hint">چند عدد صحیح مثبت را با فاصله یا ویرگول جدا کنید.</p>
+          <input id="gl" class="ltr" value="48, 180, 84" autocomplete="off" aria-label="فهرست عددها">
+          <div class="res" id="gcd-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card wide">
+          <h3>تجزیه به عوامل اول</h3>
+          <p class="hint">عدد صحیح بین ۲ تا هزار میلیارد.</p>
+          <input id="pf" class="ltr" value="360" inputmode="numeric" autocomplete="off" aria-label="عدد">
+          <div class="res" id="pf-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- جبر -->
+    <section id="p-alg" class="panel t-alg" hidden>
+      <div class="grid">
+        <article class="card">
+          <h3>معادلهٔ درجه اول</h3>
+          <p class="hint">ضریب‌ها می‌توانند منفی یا کسری باشند، مثل ‎-3‎ یا ‎1/2‎.</p>
+          <div class="eq"><input id="la" value="2" aria-label="a" autocomplete="off">x +<input id="lb" value="-3" aria-label="b" autocomplete="off">=<input id="lc" value="7" aria-label="c" autocomplete="off"></div>
+          <div class="res" id="lin-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <h3>معادلهٔ درجه دوم</h3>
+          <p class="hint">ریشه‌های حقیقی و مختلط، رأس سهمی و مجموع و حاصل‌ضرب ریشه‌ها.</p>
+          <div class="eq tight"><input id="qa" value="1" aria-label="a" autocomplete="off">x² +<input id="qb" value="-5" aria-label="b" autocomplete="off">x +<input id="qc" value="6" aria-label="c" autocomplete="off">= 0</div>
+          <div class="res" id="quad-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card wide">
+          <h3>دستگاه دو معادلهٔ دو مجهولی</h3>
+          <p class="hint">با روش دترمینان (کرامر) حل می‌شود.</p>
+          <div class="eq tight"><input id="s1a" value="2" aria-label="a1" autocomplete="off">x +<input id="s1b" value="3" aria-label="b1" autocomplete="off">y =<input id="s1c" value="12" aria-label="c1" autocomplete="off"></div>
+          <div class="eq tight"><input id="s2a" value="1" aria-label="a2" autocomplete="off">x +<input id="s2b" value="-1" aria-label="b2" autocomplete="off">y =<input id="s2c" value="1" aria-label="c2" autocomplete="off"></div>
+          <div class="res" id="sys-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- هندسه -->
+    <section id="p-geo" class="panel t-geo" hidden>
+      <div class="grid">
+        <article class="card wide">
+          <h3>مساحت، محیط و حجم</h3>
+          <p class="hint">شکل را انتخاب کنید و اندازه‌ها را بنویسید. واحد همهٔ اندازه‌ها یکسان باشد.</p>
+          <div class="fld" style="margin-bottom:10px"><label for="gs">شکل</label><select id="gs"></select></div>
+          <div class="frow" id="gf"></div>
+          <div class="res" id="g-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card wide">
+          <h3>قضیهٔ فیثاغورس</h3>
+          <p class="hint">در مثلث قائم‌الزاویه، وتر یا یکی از ضلع‌های قائمه را پیدا کنید.</p>
+          <div class="fld" style="margin-bottom:10px"><label for="pym">چه چیزی را می‌خواهید؟</label>
+            <select id="pym"><option value="1">پیدا کردن وتر</option><option value="2">پیدا کردن یک ضلع قائمه</option></select></div>
+          <div class="frow">
+            <div class="fld"><label for="pya" id="pya-l">ضلع اول (a)</label><input id="pya" class="ltr" value="3" inputmode="decimal" autocomplete="off"></div>
+            <div class="fld"><label for="pyb" id="pyb-l">ضلع دوم (b)</label><input id="pyb" class="ltr" value="4" inputmode="decimal" autocomplete="off"></div>
+          </div>
+          <div class="res" id="py-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- مثلثات -->
+    <section id="p-trig" class="panel t-trig" hidden>
+      <div class="grid">
+        <article class="card wide">
+          <h3>نسبت‌های مثلثاتی و دایرهٔ واحد</h3>
+          <p class="hint">زاویه را بنویسید. خط قرمز سینوس و خط آبی کسینوس است.</p>
+          <div class="calc-row" style="grid-template-columns:1fr 120px">
+            <input id="ta" class="ltr big" value="30" inputmode="decimal" autocomplete="off" aria-label="زاویه">
+            <select id="tu" aria-label="واحد"><option value="d">درجه</option><option value="r">رادیان</option></select>
+          </div>
+          <div class="chips" id="tchips"></div>
+          <div class="split" style="margin-top:12px">
+            <div><svg id="tsvg" class="plot" viewBox="0 0 300 300" role="img" aria-label="دایرهٔ واحد" style="margin-top:0"></svg></div>
+            <div class="res" id="trig-res" aria-live="polite" style="margin-top:0"></div>
+          </div>
+        </article>
+
+        <article class="card wide">
+          <h3>از مقدار به زاویه</h3>
+          <p class="hint">مقدار سینوس، کسینوس یا تانژانت را بدهید تا زاویه‌های بین ۰ تا ۳۶۰ درجه را ببینید.</p>
+          <div class="frow">
+            <div class="fld"><label for="ivf">تابع</label><select id="ivf"><option value="sin">sin</option><option value="cos">cos</option><option value="tan">tan</option></select></div>
+            <div class="fld"><label for="ivv">مقدار</label><input id="ivv" class="ltr" value="1/2" autocomplete="off"></div>
+          </div>
+          <div class="res" id="iv-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- آمار -->
+    <section id="p-stat" class="panel t-stat" hidden>
+      <div class="grid">
+        <article class="card wide">
+          <h3>آمار توصیفی</h3>
+          <p class="hint">داده‌ها را با فاصله یا ویرگول جدا کنید.</p>
+          <input id="sl" class="ltr big" value="12, 15, 9, 20, 15, 18, 22, 11" autocomplete="off" aria-label="داده‌ها">
+          <div class="res" id="stat-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- حسابان -->
+    <section id="p-calc" class="panel t-calc" hidden>
+      <div class="grid">
+        <article class="card wide">
+          <h3>مشتق و انتگرال چندجمله‌ای</h3>
+          <p class="hint">مثلاً ‎3x^3 - 5x^2 + 2x - 7‎ یا ‎x² + 4‎. توان‌ها صحیح و نامنفی باشند. نمودار در بازهٔ ۵- تا ۵ رسم می‌شود.</p>
+          <input id="cf" class="ltr big" value="x^3 - 3x" autocomplete="off" spellcheck="false" aria-label="تابع">
+          <div class="frow" style="margin-top:10px">
+            <div class="fld"><label for="cx0">محاسبه در x =</label><input id="cx0" class="ltr" value="2" autocomplete="off"></div>
+            <div class="fld"><label for="ca">انتگرال معین از</label><input id="ca" class="ltr" value="0" autocomplete="off"></div>
+            <div class="fld"><label for="cb">تا</label><input id="cb" class="ltr" value="2" autocomplete="off"></div>
+          </div>
+          <div class="res" id="calc-res" aria-live="polite"></div>
+          <svg id="cplot" class="plot" viewBox="0 0 600 300" role="img" aria-label="نمودار تابع و مشتق"></svg>
+        </article>
+      </div>
+    </section>
+
+    <!-- ترکیبیات -->
+    <section id="p-comb" class="panel t-comb" hidden>
+      <div class="grid">
+        <article class="card">
+          <h3>فاکتوریل، جایگشت و ترکیب</h3>
+          <p class="hint">n تا ۱۰۰۰ و r کوچکتر یا مساوی n.</p>
+          <div class="frow">
+            <div class="fld"><label for="cn">n</label><input id="cn" class="ltr" value="10" inputmode="numeric" autocomplete="off"></div>
+            <div class="fld"><label for="cr">r</label><input id="cr" class="ltr" value="3" inputmode="numeric" autocomplete="off"></div>
+          </div>
+          <div class="res" id="comb-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card">
+          <h3>دنبالهٔ فیبوناچی</h3>
+          <p class="hint">تعداد جمله‌ها از ۱ تا ۹۰.</p>
+          <input id="fn" class="ltr" value="14" inputmode="numeric" autocomplete="off" aria-label="تعداد جمله‌ها">
+          <div class="res" id="fib-res" aria-live="polite"></div>
+        </article>
+
+        <article class="card wide">
+          <h3>تبدیل مبنا</h3>
+          <p class="hint">عدد را با مبنای فعلی‌اش بنویسید تا در مبنای ۲، ۸، ۱۰ و ۱۶ ببینید.</p>
+          <div class="calc-row" style="grid-template-columns:1fr 150px">
+            <input id="bv" class="ltr big" value="255" autocomplete="off" aria-label="عدد">
+            <select id="bb" aria-label="مبنا"><option value="10">مبنای ۱۰</option><option value="2">مبنای ۲</option><option value="8">مبنای ۸</option><option value="16">مبنای ۱۶</option></select>
+          </div>
+          <div class="res" id="base-res" aria-live="polite"></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <p class="foot">همهٔ محاسبه‌ها در مرورگر شما انجام می‌شود. جواب‌های اعشاری تا حدود ۱۲ رقم معنادار نمایش داده می‌شوند.<br>طراحی: صدرا فرح‌بخشیان</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+var P='۰۱۲۳۴۵۶۷۸۹';
+var fa=function(s){return String(s).replace(/\d/g,function(d){return P[+d];});};
+var $=function(id){return document.getElementById(id);};
+var M=function(s){return '<span class="m">'+s+'</span>';};
+var err=function(s){return '<div class="err">'+s+'</div>';};
+var grp=function(s){return s.replace(/\B(?=(\d{3})+(?!\d))/g,'٬');};
+
+function fmt(x){
+  if(typeof x==='bigint'){var n=x<0n;return (n?'−':'')+fa(grp((n?-x:x).toString()));}
+  if(typeof x!=='number'||!isFinite(x))return 'تعریف‌نشده';
+  if(Math.abs(x)<1e-12)x=0;
+  var s=String(parseFloat(x.toPrecision(12)));var neg=s[0]==='-';if(neg)s=s.slice(1);
+  if(s.indexOf('e')>-1){var t=s.split('e');return (neg?'−':'')+fa(t[0]).replace('.','٫')+'×۱۰<sup>'+fa(t[1].replace('+','').replace('-','−'))+'</sup>';}
+  var p=s.split('.');
+  return (neg?'−':'')+fa(grp(p[0]))+(p[1]?'٫'+fa(p[1]):'');
+}
+function toFrac(x){
+  if(!isFinite(x)||Number.isInteger(x))return null;
+  var h1=1,h0=0,k1=0,k0=1,b=x;
+  for(var i=0;i<24;i++){
+    var a=Math.floor(b),h2=a*h1+h0,k2=a*k1+k0;h0=h1;h1=h2;k0=k1;k1=k2;
+    if(Math.abs(x-h1/k1)<1e-10)break;
+    var fr=b-a;if(fr<1e-12)break;b=1/fr;if(k1>5000)return null;
+  }
+  if(k1>1000||Math.abs(x-h1/k1)>1e-9)return null;
+  return {p:h1,q:k1};
+}
+function fmtF(x){var f=toFrac(x);return f?fmt(f.p)+'/'+fmt(f.q)+' ('+fmt(x)+')':fmt(x);}
+var par=function(n){return n<0?'('+fmt(n)+')':fmt(n);};
+var sg=function(n){return n<0?'− '+fmt(-n):'+ '+fmt(n);};
+var fmtS=function(x){return fmt(x).replace(/<[^>]+>/g,'');};
+
+function norm(s){
+  return String(s).replace(/[۰-۹]/g,function(d){return '۰۱۲۳۴۵۶۷۸۹'.indexOf(d);})
+    .replace(/[٠-٩]/g,function(d){return '٠١٢٣٤٥٦٧٨٩'.indexOf(d);})
+    .replace(/[×✕]/g,'*').replace(/÷/g,'/').replace(/٫/g,'.').replace(/٬/g,'').replace(/[،؛]/g,',')
+    .replace(/[−–—]/g,'-').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/²/g,'^2').replace(/³/g,'^3').replace(/٪/g,'%');
+}
+
+/* Safe recursive-descent expression evaluator */
+function ev(src,deg){
+  var s=norm(src).replace(/\s+/g,'');
+  if(!s)throw new Error('empty');
+  var i=0;
+  var d2r=function(x){return x*Math.PI/180;},r2d=function(x){return x*180/Math.PI;};
+  var F={sqrt:Math.sqrt,cbrt:Math.cbrt,abs:Math.abs,ln:Math.log,log:Math.log10,exp:Math.exp,
+    sin:function(x){return Math.sin(deg?d2r(x):x);},cos:function(x){return Math.cos(deg?d2r(x):x);},tan:function(x){return Math.tan(deg?d2r(x):x);},
+    asin:function(x){return deg?r2d(Math.asin(x)):Math.asin(x);},acos:function(x){return deg?r2d(Math.acos(x)):Math.acos(x);},atan:function(x){return deg?r2d(Math.atan(x)):Math.atan(x);}};
+  var K={pi:Math.PI,e:Math.E};
+  var isL=function(c){return c!==undefined&&/[a-zA-Z]/.test(c);};
+  var isD=function(c){return c!==undefined&&/[0-9.]/.test(c);};
+  function expr(){var v=term();while(s[i]==='+'||s[i]==='-'){var o=s[i++];var r=term();v=o==='+'?v+r:v-r;}return v;}
+  function term(){var v=unary();for(;;){var c=s[i];if(c==='*'){i++;v*=unary();}else if(c==='/'){i++;v/=unary();}else if(c==='('||isL(c)||isD(c)){v*=unary();}else break;}return v;}
+  function unary(){if(s[i]==='-'){i++;return -unary();}if(s[i]==='+'){i++;return unary();}return power();}
+  function power(){var b=post();if(s[i]==='^'){i++;return Math.pow(b,unary());}return b;}
+  function post(){var v=prim();for(;;){if(s[i]==='!'){i++;v=fct(v);}else if(s[i]==='%'){i++;v/=100;}else break;}return v;}
+  function fct(v){if(!Number.isInteger(v)||v<0||v>170)return NaN;var r=1;for(var k=2;k<=v;k++)r*=k;return r;}
+  function prim(){
+    var c=s[i];
+    if(c==='('){i++;var v=expr();if(s[i]!==')')throw new Error('paren');i++;return v;}
+    if(isD(c)){var m=/^(\d+\.?\d*|\.\d+)/.exec(s.slice(i));if(!m)throw new Error('num');i+=m[0].length;return parseFloat(m[0]);}
+    if(isL(c)){var nm=/^[a-zA-Z]+/.exec(s.slice(i))[0];i+=nm.length;
+      if(F[nm])return F[nm](post());
+      if(K.hasOwnProperty(nm))return K[nm];
+      throw new Error('name');}
+    throw new Error('syntax');
+  }
+  var out=expr();if(i<s.length)throw new Error('extra');return out;
+}
+function val(id){try{return ev($(id).value,true);}catch(e){return NaN;}}
+function bind(ids,fn){ids.forEach(function(id){var e=$(id);e.addEventListener('input',fn);e.addEventListener('change',fn);});fn();}
+function ok(main,steps){return '<div class="ans">'+main+'</div>'+(steps&&steps.length?'<ol class="steps">'+steps.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>':'');}
+var NEED='همهٔ عددها را درست وارد کنید.';
+
+/* ---------- حساب ---------- */
+var KEYS=[['(','('],[')',')'],['÷','/','op'],['×','*','op'],['−','-','op'],['+','+','op'],['^','^','op'],['√','sqrt(','op'],['π','pi'],['!','!'],['%','%'],['sin','sin('],['cos','cos('],['tan','tan('],['log','log('],['ln','ln('],['C','C'],['⌫','B']];
+function ins(t){
+  var el=$('ex');
+  if(t==='C'){el.value='';}
+  else if(t==='B'){el.value=el.value.slice(0,-1);}
+  else{
+    var s=typeof el.selectionStart==='number'?el.selectionStart:el.value.length;
+    var e=typeof el.selectionEnd==='number'?el.selectionEnd:s;
+    el.value=el.value.slice(0,s)+t+el.value.slice(e);
+    var p=s+t.length;el.focus();try{el.setSelectionRange(p,p);}catch(x){}
+  }
+  calcEx();
+}
+function calcEx(){
+  var r=$('ex-res'),src=$('ex').value;
+  if(!src.trim()){r.innerHTML='<span class="sub">یک عبارت بنویسید.</span>';return;}
+  try{
+    var v=ev(src,$('angle').value==='1');var f=toFrac(v);
+    r.innerHTML='<div class="ans">'+M('= '+fmt(v))+'</div>'+(f?'<p class="sub">به‌صورت کسر: '+M(fmt(f.p)+'/'+fmt(f.q))+'</p>':'');
+  }catch(e){r.innerHTML=err('عبارت درست نیست. پرانتزها و علامت‌ها را بررسی کنید.');}
+}
+function calcPct(){
+  var m=$('pm').value,x=val('pa'),y=val('pb'),r=$('pct-res');
+  if(isNaN(x)||isNaN(y)){r.innerHTML=err(NEED);return;}
+  var ans,st,a;
+  if(m==='1'){a=x*y/100;ans=M(fmt(a));st=M(fmt(x)+'% × '+fmt(y)+' = '+fmt(x)+' × '+fmt(y)+' ÷ ۱۰۰ = '+fmt(a));}
+  else if(m==='2'){if(y===0){r.innerHTML=err('y نمی‌تواند صفر باشد.');return;}a=x/y*100;ans=M(fmt(a)+'%');st=M(fmt(x)+' ÷ '+fmt(y)+' × ۱۰۰ = '+fmt(a)+'%');}
+  else{if(x===0){r.innerHTML=err('x نمی‌تواند صفر باشد.');return;}a=(y-x)/Math.abs(x)*100;ans=(a>=0?'افزایش ':'کاهش ')+M(fmt(Math.abs(a))+'%');st=M('('+fmt(y)+' − '+par(x)+') ÷ '+fmt(Math.abs(x))+' × ۱۰۰ = '+fmt(a)+'%');}
+  r.innerHTML=ok(ans,[st]);
+}
+function calcGcd(){
+  var r=$('gcd-res');
+  var nums=norm($('gl').value).split(/[,\s]+/).filter(Boolean).map(Number);
+  if(nums.length<2||nums.some(function(n){return !Number.isInteger(n)||n<=0||n>1e12;})){r.innerHTML=err('دست‌کم دو عدد صحیح مثبت (حداکثر هزار میلیارد) وارد کنید.');return;}
+  var B=nums.map(function(n){return BigInt(n);});
+  var g2=function(a,b){while(b){var t=a%b;a=b;b=t;}return a;};
+  var g=B.reduce(g2),l=B.reduce(function(a,b){return a/g2(a,b)*b;});
+  var a=B[0],b=B[1];if(a<b){var t=a;a=b;b=t;}
+  var st=[];
+  while(b>0n){var q=a/b,rem=a%b;st.push(M(fmt(a)+' = '+fmt(b)+' × '+fmt(q)+' + '+fmt(rem)));a=b;b=rem;}
+  r.innerHTML='<div class="kv"><div><small>ب.م.م</small><b>'+M(fmt(g))+'</b></div><div><small>ک.م.م</small><b>'+M(fmt(l))+'</b></div></div>'+
+    (g===1n?'<p class="sub">عددها نسبت به هم اول‌اند.</p>':'')+
+    '<p class="sub">الگوریتم اقلیدس برای دو عدد اول:</p><ol class="steps">'+st.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>';
+}
+function calcPf(){
+  var r=$('pf-res'),n=val('pf');
+  if(!Number.isInteger(n)||n<2||n>1e12){r.innerHTML=err('یک عدد صحیح بین ۲ تا هزار میلیارد وارد کنید.');return;}
+  var m=n,f=[];
+  for(var p=2;p*p<=m;p+=(p===2?1:2)){var e=0;while(m%p===0){m/=p;e++;}if(e)f.push([p,e]);}
+  if(m>1)f.push([m,1]);
+  var cnt=1,sum=1;
+  f.forEach(function(x){cnt*=x[1]+1;sum*=(Math.pow(x[0],x[1]+1)-1)/(x[0]-1);});
+  var str=f.map(function(x){return fa(String(x[0]))+(x[1]>1?'<sup>'+fa(x[1])+'</sup>':'');}).join(' × ');
+  var prime=f.length===1&&f[0][1]===1;
+  r.innerHTML='<div class="ans">'+M(fmt(n)+' = '+str)+'</div>'+
+    '<div class="kv" style="margin-top:10px"><div><small>اول است؟</small><b>'+(prime?'بله':'خیر')+'</b></div><div><small>تعداد مقسوم‌علیه‌ها</small><b>'+M(fmt(cnt))+'</b></div><div><small>مجموع مقسوم‌علیه‌ها</small><b>'+M(fmt(Math.round(sum)))+'</b></div></div>';
+}
+
+/* ---------- جبر ---------- */
+function calcLin(){
+  var a=val('la'),b=val('lb'),c=val('lc'),r=$('lin-res');
+  if([a,b,c].some(isNaN)){r.innerHTML=err(NEED);return;}
+  var eq=M(fmt(a)+'x '+sg(b)+' = '+fmt(c));
+  if(a===0){r.innerHTML=ok(b===c?'بی‌شمار جواب دارد':'جواب ندارد',[eq,'چون ضریب x صفر است، فقط برابری '+M(fmt(b)+' = '+fmt(c))+' بررسی می‌شود.']);return;}
+  var x=(c-b)/a;
+  r.innerHTML=ok(M('x = '+fmtF(x)),[eq,M(fmt(a)+'x = '+fmt(c)+' − '+par(b)+' = '+fmt(c-b)),M('x = '+fmt(c-b)+' ÷ '+par(a)+' = '+fmtF(x))]);
+}
+function calcQuad(){
+  var a=val('qa'),b=val('qb'),c=val('qc'),r=$('quad-res');
+  if([a,b,c].some(isNaN)){r.innerHTML=err(NEED);return;}
+  if(a===0){r.innerHTML=err('اگر a صفر باشد معادله درجه دوم نیست. از کارت درجه اول استفاده کنید.');return;}
+  var d=b*b-4*a*c,tol=1e-12*Math.max(1,b*b,Math.abs(4*a*c));
+  var st=[M('Δ = b² − 4ac = '+par(b)+'² − 4 × '+par(a)+' × '+par(c)+' = '+fmt(d))],ans;
+  if(d>tol){
+    var sq=Math.sqrt(d),x1=(-b+sq)/(2*a),x2=(-b-sq)/(2*a);
+    st.push('Δ مثبت است، پس دو ریشهٔ حقیقی داریم.');
+    st.push(M('x = (−b ± √Δ) ÷ 2a = ('+fmt(-b)+' ± '+fmt(sq)+') ÷ '+fmt(2*a)));
+    ans=M('x₁ = '+fmtF(x1))+'<br>'+M('x₂ = '+fmtF(x2));
+  }else if(Math.abs(d)<=tol){
+    var x0=-b/(2*a);st.push('Δ صفر است، پس یک ریشهٔ مضاعف داریم.');st.push(M('x = −b ÷ 2a = '+fmt(-b)+' ÷ '+fmt(2*a)));
+    ans=M('x = '+fmtF(x0));
+  }else{
+    var re=-b/(2*a),im=Math.sqrt(-d)/(2*Math.abs(a));
+    st.push('Δ منفی است، پس ریشه‌ها مختلط‌اند.');
+    ans=M('x = '+fmt(re)+' ± '+fmt(im)+'i');
+  }
+  var xv=-b/(2*a),yv=c-b*b/(4*a);
+  st.push('رأس سهمی: '+M('( '+fmtF(xv)+' , '+fmtF(yv)+' )'));
+  st.push('مجموع ریشه‌ها '+M(fmtF(-b/a))+' و حاصل‌ضرب ریشه‌ها '+M(fmtF(c/a)));
+  r.innerHTML=ok(ans,st);
+}
+function calcSys(){
+  var a1=val('s1a'),b1=val('s1b'),c1=val('s1c'),a2=val('s2a'),b2=val('s2b'),c2=val('s2c'),r=$('sys-res');
+  if([a1,b1,c1,a2,b2,c2].some(isNaN)){r.innerHTML=err(NEED);return;}
+  var D=a1*b2-a2*b1,Dx=c1*b2-c2*b1,Dy=a1*c2-a2*c1;
+  var st=[M('D = '+par(a1)+' × '+par(b2)+' − '+par(a2)+' × '+par(b1)+' = '+fmt(D)),M('Dx = '+par(c1)+' × '+par(b2)+' − '+par(c2)+' × '+par(b1)+' = '+fmt(Dx)),M('Dy = '+par(a1)+' × '+par(c2)+' − '+par(a2)+' × '+par(c1)+' = '+fmt(Dy))];
+  if(Math.abs(D)<1e-12){
+    var inf=Math.abs(Dx)<1e-12&&Math.abs(Dy)<1e-12;
+    st.push('D صفر است، پس دستگاه جواب یکتا ندارد.');
+    r.innerHTML=ok(inf?'بی‌شمار جواب دارد':'جواب ندارد',st);return;
+  }
+  var x=Dx/D,y=Dy/D;
+  st.push(M('x = Dx ÷ D = '+fmtF(x)));st.push(M('y = Dy ÷ D = '+fmtF(y)));
+  r.innerHTML=ok(M('x = '+fmtF(x))+'<br>'+M('y = '+fmtF(y)),st);
+}
+
+/* ---------- هندسه ---------- */
+var PI=Math.PI;
+var SH={
+  square:{n:'مربع',f:[['a','ضلع']],d:[5],c:function(v){return [['مساحت',v.a*v.a,'a²'],['محیط',4*v.a,'4a'],['قطر',v.a*Math.SQRT2,'a√2']];}},
+  rect:{n:'مستطیل',f:[['a','طول'],['b','عرض']],d:[8,5],c:function(v){return [['مساحت',v.a*v.b,'a × b'],['محیط',2*(v.a+v.b),'2(a + b)'],['قطر',Math.hypot(v.a,v.b),'√(a² + b²)']];}},
+  tri:{n:'مثلث (قاعده و ارتفاع)',f:[['b','قاعده'],['h','ارتفاع']],d:[6,4],c:function(v){return [['مساحت',v.b*v.h/2,'½ × b × h']];}},
+  heron:{n:'مثلث (سه ضلع)',f:[['a','ضلع اول'],['b','ضلع دوم'],['c','ضلع سوم']],d:[3,4,5],c:function(v){
+    var a=v.a,b=v.b,c=v.c;if(a+b<=c||a+c<=b||b+c<=a)return null;
+    var s=(a+b+c)/2,A=Math.sqrt(s*(s-a)*(s-b)*(s-c));
+    var q=[a*a,b*b,c*c].sort(function(x,y){return x-y;}),e=1e-9*q[2];
+    var kind=Math.abs(q[0]+q[1]-q[2])<e?'قائم‌الزاویه':(q[0]+q[1]>q[2]?'حاده':'منفرجه');
+    var sides=(a===b&&b===c)?'متساوی‌الاضلاع':((a===b||b===c||a===c)?'متساوی‌الساقین':'مختلف‌الاضلاع');
+    return [['مساحت',A,'فرمول هرون'],['محیط',a+b+c,'a + b + c'],['نوع مثلث',sides+'، '+kind]];}},
+  circle:{n:'دایره',f:[['r','شعاع']],d:[5],c:function(v){return [['مساحت',PI*v.r*v.r,'πr²'],['محیط',2*PI*v.r,'2πr'],['قطر',2*v.r,'2r']];}},
+  trap:{n:'ذوزنقه',f:[['a','قاعدهٔ بزرگ'],['b','قاعدهٔ کوچک'],['h','ارتفاع']],d:[10,6,4],c:function(v){return [['مساحت',(v.a+v.b)*v.h/2,'(a + b) × h ÷ 2']];}},
+  rhomb:{n:'لوزی',f:[['p','قطر اول'],['q','قطر دوم']],d:[8,6],c:function(v){var s=Math.hypot(v.p/2,v.q/2);return [['مساحت',v.p*v.q/2,'p × q ÷ 2'],['ضلع',s,'√((p÷2)² + (q÷2)²)'],['محیط',4*s,'4 × ضلع']];}},
+  para:{n:'متوازی‌الاضلاع',f:[['b','قاعده'],['h','ارتفاع']],d:[7,4],c:function(v){return [['مساحت',v.b*v.h,'b × h']];}},
+  cube:{n:'مکعب',f:[['a','یال']],d:[3],c:function(v){return [['حجم',v.a*v.a*v.a,'a³'],['مساحت کل',6*v.a*v.a,'6a²'],['قطر فضایی',v.a*Math.sqrt(3),'a√3']];}},
+  box:{n:'مکعب مستطیل',f:[['a','طول'],['b','عرض'],['c','ارتفاع']],d:[5,4,3],c:function(v){return [['حجم',v.a*v.b*v.c,'a × b × c'],['مساحت کل',2*(v.a*v.b+v.b*v.c+v.a*v.c),'2(ab + bc + ac)'],['قطر فضایی',Math.sqrt(v.a*v.a+v.b*v.b+v.c*v.c),'√(a² + b² + c²)']];}},
+  sphere:{n:'کره',f:[['r','شعاع']],d:[3],c:function(v){return [['حجم',4/3*PI*Math.pow(v.r,3),'4⁄3 πr³'],['مساحت سطح',4*PI*v.r*v.r,'4πr²']];}},
+  cyl:{n:'استوانه',f:[['r','شعاع قاعده'],['h','ارتفاع']],d:[3,7],c:function(v){return [['حجم',PI*v.r*v.r*v.h,'πr²h'],['مساحت جانبی',2*PI*v.r*v.h,'2πrh'],['مساحت کل',2*PI*v.r*(v.r+v.h),'2πr(r + h)']];}},
+  cone:{n:'مخروط',f:[['r','شعاع قاعده'],['h','ارتفاع']],d:[3,4],c:function(v){var l=Math.hypot(v.r,v.h);return [['حجم',PI*v.r*v.r*v.h/3,'πr²h ÷ 3'],['مولد',l,'√(r² + h²)'],['مساحت کل',PI*v.r*(v.r+l),'πr(r + مولد)']];}}
+};
+function buildShape(){
+  var s=SH[$('gs').value];
+  $('gf').innerHTML=s.f.map(function(f,i){return '<div class="fld"><label for="gv'+i+'">'+f[1]+'</label><input id="gv'+i+'" class="ltr" inputmode="decimal" value="'+s.d[i]+'" autocomplete="off"></div>';}).join('');
+  calcShape();
+}
+function calcShape(){
+  var s=SH[$('gs').value],v={},bad=false,r=$('g-res');
+  s.f.forEach(function(f,i){var x=val('gv'+i);v[f[0]]=x;if(!(x>0))bad=true;});
+  if(bad){r.innerHTML=err('همهٔ اندازه‌ها باید عددی مثبت باشند.');return;}
+  var rows=s.c(v);
+  if(!rows){r.innerHTML=err('این سه ضلع مثلث نمی‌سازند. مجموع هر دو ضلع باید از ضلع سوم بزرگ‌تر باشد.');return;}
+  r.innerHTML='<div class="kv">'+rows.map(function(x){return '<div><small>'+x[0]+(x[2]?' · '+M(x[2]):'')+'</small><b>'+(typeof x[1]==='string'?x[1]:M(fmt(x[1])))+'</b></div>';}).join('')+'</div>';
+}
+function calcPy(){
+  var m=$('pym').value,a=val('pya'),b=val('pyb'),r=$('py-res');
+  $('pya-l').textContent=m==='1'?'ضلع اول (a)':'وتر (c)';
+  $('pyb-l').textContent=m==='1'?'ضلع دوم (b)':'یک ضلع قائمه (a)';
+  if(!(a>0&&b>0)){r.innerHTML=err('هر دو اندازه باید مثبت باشند.');return;}
+  if(m==='1'){
+    var c=Math.hypot(a,b);
+    r.innerHTML=ok(M('c = '+fmt(c)),[M('c² = a² + b² = '+fmt(a*a)+' + '+fmt(b*b)+' = '+fmt(a*a+b*b)),M('c = √'+fmt(a*a+b*b)+' = '+fmt(c))]);
+  }else{
+    if(a<=b){r.innerHTML=err('وتر باید از ضلع قائمه بلندتر باشد.');return;}
+    var x=Math.sqrt(a*a-b*b);
+    r.innerHTML=ok(M('b = '+fmt(x)),[M('b² = c² − a² = '+fmt(a*a)+' − '+fmt(b*b)+' = '+fmt(a*a-b*b)),M('b = √'+fmt(a*a-b*b)+' = '+fmt(x))]);
+  }
+}
+
+/* ---------- مثلثات ---------- */
+var EX={0:['0','1'],30:['1/2','√3/2'],45:['√2/2','√2/2'],60:['√3/2','1/2'],90:['1','0']};
+function exact(deg){
+  if(!Number.isInteger(deg))return null;
+  var d=((deg%360)+360)%360,ref=d<=90?d:(d<=180?180-d:(d<=270?d-180:360-d));
+  if(!EX.hasOwnProperty(ref))return null;
+  var sn=d>180?'−':'',cs=(d>90&&d<270)?'−':'';
+  var sv=EX[ref][0],cv=EX[ref][1];
+  return {s:(sv==='0'?'0':sn+sv),c:(cv==='0'?'0':cs+cv)};
+}
+function drawCircle(rad){
+  var R=100,cx=150,cy=150,px=cx+R*Math.cos(rad),py=cy-R*Math.sin(rad);
+  var a=((rad%(2*PI))+2*PI)%(2*PI),g='';
+  var f=function(n){return n.toFixed(1);};
+  g+='<line class="gl" x1="10" y1="'+cy+'" x2="290" y2="'+cy+'"/><line class="gl" x1="'+cx+'" y1="10" x2="'+cx+'" y2="290"/>';
+  g+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="var(--muted)" stroke-width="1.5"/>';
+  g+='<line class="ax" x1="10" y1="'+cy+'" x2="290" y2="'+cy+'"/><line class="ax" x1="'+cx+'" y1="10" x2="'+cx+'" y2="290"/>';
+  if(a>1e-9&&a<2*PI-1e-9){var ex=cx+32*Math.cos(a),ey=cy-32*Math.sin(a);g+='<path d="M '+(cx+32)+' '+cy+' A 32 32 0 '+(a>PI?1:0)+' 0 '+f(ex)+' '+f(ey)+'" fill="none" stroke="var(--c-alg)" stroke-width="2.5"/>';}
+  g+='<line x1="'+f(px)+'" y1="'+cy+'" x2="'+f(px)+'" y2="'+f(py)+'" stroke="var(--c-arith)" stroke-width="4" stroke-linecap="round"/>';
+  g+='<line x1="'+cx+'" y1="'+cy+'" x2="'+f(px)+'" y2="'+cy+'" stroke="var(--c-trig)" stroke-width="4" stroke-linecap="round"/>';
+  g+='<line x1="'+cx+'" y1="'+cy+'" x2="'+f(px)+'" y2="'+f(py)+'" stroke="var(--fg)" stroke-width="2"/>';
+  g+='<circle cx="'+f(px)+'" cy="'+f(py)+'" r="6" fill="var(--c-calc)" stroke="var(--surface)" stroke-width="2"/>';
+  g+='<text class="tx" x="283" y="'+(cy-6)+'" text-anchor="end">'+fa(1)+'</text><text class="tx" x="'+(cx+6)+'" y="22">'+fa(1)+'</text>';
+  $('tsvg').innerHTML=g;
+}
+function calcTrig(){
+  var x=val('ta'),u=$('tu').value,r=$('trig-res');
+  if(isNaN(x)){r.innerHTML=err('زاویه را درست وارد کنید.');return;}
+  var rad=u==='d'?x*PI/180:x,deg=u==='d'?x:x*180/PI;
+  var s=Math.sin(rad),c=Math.cos(rad),z=function(v){return Math.abs(v)<1e-12?0:v;};
+  s=z(s);c=z(c);
+  var inv=function(v){return v===0?NaN:1/v;};
+  var t=c===0?NaN:s/c,cot=s===0?NaN:c/s;
+  var tile=function(l,v){return '<div><small>'+l+'</small><b>'+M(fmt(v))+'</b></div>';};
+  var fr=toFrac(deg/180),radTxt;
+  if(Number.isInteger(deg/180))radTxt=(deg/180===0?'۰':(Math.abs(deg/180)===1?'':fmt(deg/180))+'π');
+  else if(fr)radTxt=(Math.abs(fr.p)===1?(fr.p<0?'−':''):fmt(fr.p))+'π/'+fmt(fr.q);
+  else radTxt=fmt(deg*PI/180);
+  var ex=exact(deg),exTxt='';
+  if(ex)exTxt='<p class="sub">مقدار دقیق: '+M('sin = '+ex.s)+' و '+M('cos = '+ex.c)+'</p>';
+  r.innerHTML='<div class="kv">'+tile('sin',s)+tile('cos',c)+tile('tan',t)+tile('cot',cot)+tile('sec',inv(c))+tile('csc',inv(s))+'</div>'+exTxt+
+    '<p class="sub">این زاویه برابر است با '+M(fmt(deg)+'°')+' یا '+M(radTxt+' rad')+'.</p>';
+  drawCircle(rad);
+}
+function calcInv(){
+  var f=$('ivf').value,v=val('ivv'),r=$('iv-res');
+  if(isNaN(v)){r.innerHTML=err('مقدار را درست وارد کنید.');return;}
+  if(f!=='tan'&&Math.abs(v)>1){r.innerHTML=err('مقدار sin و cos باید بین ۱- و ۱ باشد.');return;}
+  var t0=(f==='sin'?Math.asin(v):(f==='cos'?Math.acos(v):Math.atan(v)))*180/PI;
+  var cand=f==='sin'?[t0,180-t0]:(f==='cos'?[t0,360-t0]:[t0,t0+180]);
+  var out=[];
+  cand.forEach(function(a){a=((a%360)+360)%360;if(!out.some(function(o){return Math.abs(o-a)<1e-9||Math.abs(Math.abs(o-a)-360)<1e-9;}))out.push(a);});
+  out.sort(function(a,b){return a-b;});
+  r.innerHTML='<div class="ans">'+M(f+' θ = '+fmt(v))+'</div><div class="tags">'+out.map(function(a){return '<span>'+fmt(a)+'°</span>';}).join('')+'</div>'+
+    '<p class="sub">زاویهٔ اصلی '+M(fmt(t0)+'°')+' است. جواب‌های دیگر با افزودن مضرب‌های ۳۶۰ درجه به‌دست می‌آیند.</p>';
+}
+
+/* ---------- آمار ---------- */
+function median(a){var n=a.length,h=Math.floor(n/2);return n%2?a[h]:(a[h-1]+a[h])/2;}
+function barChart(a,mean){
+  var W=600,H=230,pl=14,pr=14,pt=22,pb=22,n=a.length;
+  var lo=Math.min.apply(null,a.concat(0)),hi=Math.max.apply(null,a.concat(0)),rng=(hi-lo)||1;
+  var y=function(v){return pt+(H-pt-pb)*(1-(v-lo)/rng);};
+  var bw=(W-pl-pr)/n,cols=['--c-arith','--c-alg','--c-geo','--c-trig','--c-stat','--c-calc','--c-comb'],g='';
+  g+='<line class="ax" x1="'+pl+'" y1="'+y(0).toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y(0).toFixed(1)+'"/>';
+  a.forEach(function(v,k){
+    var x=pl+k*bw+bw*0.15,w=bw*0.7,y1=y(Math.max(v,0)),y2=y(Math.min(v,0));
+    g+='<rect x="'+x.toFixed(1)+'" y="'+y1.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+Math.max(1,y2-y1).toFixed(1)+'" rx="5" fill="var('+cols[k%7]+')"/>';
+    if(n<=16)g+='<text class="tx" x="'+(x+w/2).toFixed(1)+'" y="'+(y1-5).toFixed(1)+'" text-anchor="middle">'+fmtS(v)+'</text>';
+  });
+  var ym=y(mean).toFixed(1);
+  g+='<line x1="'+pl+'" y1="'+ym+'" x2="'+(W-pr)+'" y2="'+ym+'" stroke="var(--fg)" stroke-width="1.5" stroke-dasharray="6 5"/>';
+  g+='<text class="tx" x="'+(W-pr)+'" y="'+(parseFloat(ym)-5)+'" text-anchor="end">میانگین '+fmtS(mean)+'</text>';
+  return '<svg class="plot" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="نمودار میله‌ای داده‌ها">'+g+'</svg>';
+}
+function calcStat(){
+  var r=$('stat-res');
+  var a=norm($('sl').value).split(/[,\s]+/).filter(Boolean).map(Number);
+  if(a.length<2||a.some(isNaN)){r.innerHTML=err('دست‌کم دو عدد وارد کنید و آن‌ها را با فاصله یا ویرگول جدا کنید.');return;}
+  var n=a.length,sum=a.reduce(function(p,q){return p+q;},0),mean=sum/n;
+  var s=a.slice().sort(function(p,q){return p-q;}),h=Math.floor(n/2);
+  var med=median(s),q1=median(s.slice(0,h)),q3=median(s.slice(n%2?h+1:h));
+  var cnt={},mx=0;s.forEach(function(v){cnt[v]=(cnt[v]||0)+1;if(cnt[v]>mx)mx=cnt[v];});
+  var modes=mx>1?Object.keys(cnt).filter(function(k){return cnt[k]===mx;}).map(Number).sort(function(p,q){return p-q;}):[];
+  var ss=a.reduce(function(p,v){return p+(v-mean)*(v-mean);},0);
+  var vp=ss/n,vs=ss/(n-1);
+  var tile=function(l,v){return '<div><small>'+l+'</small><b>'+(typeof v==='string'?v:M(fmt(v)))+'</b></div>';};
+  r.innerHTML='<div class="kv">'+tile('تعداد',n)+tile('مجموع',sum)+tile('میانگین',mean)+tile('میانه',med)+
+    tile('نما',modes.length?M(modes.map(fmt).join(' ، ')):'ندارد')+tile('کمترین',s[0])+tile('بیشترین',s[n-1])+tile('دامنهٔ تغییرات',s[n-1]-s[0])+
+    tile('چارک اول',q1)+tile('چارک سوم',q3)+tile('واریانس (جامعه)',vp)+tile('انحراف معیار (جامعه)',Math.sqrt(vp))+
+    tile('واریانس (نمونه)',vs)+tile('انحراف معیار (نمونه)',Math.sqrt(vs))+'</div>'+
+    '<p class="sub">داده‌های مرتب‌شده: '+M(s.map(fmt).join(' ، '))+'</p>'+
+    (n<=40?barChart(a,mean):'<p class="sub">برای رسم نمودار حداکثر ۴۰ داده لازم است.</p>');
+}
+
+/* ---------- حسابان ---------- */
+function parsePoly(src){
+  var s=norm(src).replace(/\s+/g,'').replace(/X/g,'x');
+  if(!s)throw new Error('تابع را بنویسید.');
+  if(/[()]/.test(s))throw new Error('پرانتز پشتیبانی نمی‌شود. عبارت را بازنویسی کنید.');
+  if(/\^-/.test(s))throw new Error('توان منفی پشتیبانی نمی‌شود.');
+  var co=[],parts=s.split(/(?=[+-])/);
+  parts.forEach(function(t){
+    if(t==='')return;
+    var m=/^([+-]?)(\d*\.?\d*)(\*?x(?:\^(\d+))?)?$/.exec(t);
+    if(!m||(m[2]===''&&!m[3])||m[2]==='.')throw new Error('«'+t+'» قابل فهم نیست. از قالبی مثل 3x^2 - 5x + 2 استفاده کنید.');
+    var c=m[2]===''?1:parseFloat(m[2]);if(m[1]==='-')c=-c;
+    var k=m[3]?(m[4]!==undefined?parseInt(m[4],10):1):0;
+    if(k>20)throw new Error('بیشترین توان مجاز ۲۰ است.');
+    while(co.length<=k)co.push(0);co[k]+=c;
+  });
+  return co;
+}
+function polyHTML(co,tail){
+  var out='';
+  for(var k=co.length-1;k>=0;k--){
+    var c=co[k];if(Math.abs(c)<1e-12)continue;
+    var neg=c<0,ac=Math.abs(c),f=toFrac(ac),cs;
+    if(k>0&&Math.abs(ac-1)<1e-12)cs='';else cs=f?fmt(f.p)+'/'+fmt(f.q):fmt(ac);
+    var xs=k>0?'x'+(k>1?'<sup>'+fa(k)+'</sup>':''):'';
+    out+=(out?(neg?' − ':' + '):(neg?'−':''))+cs+xs;
+  }
+  if(!out)out='۰';
+  return out+(tail||'');
+}
+var ep=function(c,x){var r=0;for(var k=c.length-1;k>=0;k--)r=r*x+c[k];return r;};
+function niceStep(r){var e=Math.pow(10,Math.floor(Math.log10(r))),f=r/e;return (f<1.5?1:f<3.5?2:f<7.5?5:10)*e;}
+function plot(co,dco,a,b){
+  var W=600,H=300,pl=40,pr=12,pt=12,pb=24,X0=-5,X1=5,N=240,i;
+  var xs=[],fy=[],dy=[],all=[0];
+  for(i=0;i<=N;i++){var x=X0+(X1-X0)*i/N;xs.push(x);var u=ep(co,x),w=ep(dco,x);fy.push(u);dy.push(w);if(Math.abs(u)<1e6)all.push(u);if(Math.abs(w)<1e6)all.push(w);}
+  var lo=Math.max(-30,Math.min.apply(null,all)),hi=Math.min(30,Math.max.apply(null,all));
+  if(hi-lo<1){lo=-1;hi=1;}
+  var pad=(hi-lo)*0.08;lo-=pad;hi+=pad;
+  var sx=function(x){return pl+(W-pl-pr)*(x-X0)/(X1-X0);},sy=function(y){return pt+(H-pt-pb)*(1-(y-lo)/(hi-lo));};
+  var f1=function(n){return n.toFixed(1);},g='';
+  for(i=X0;i<=X1;i++){g+='<line class="gl" x1="'+f1(sx(i))+'" y1="'+pt+'" x2="'+f1(sx(i))+'" y2="'+(H-pb)+'"/><text class="tx" x="'+f1(sx(i))+'" y="'+(H-8)+'" text-anchor="middle">'+fa(String(i)).replace('-','−')+'</text>';}
+  var st=niceStep((hi-lo)/5);
+  for(var yv=Math.ceil(lo/st)*st;yv<=hi;yv+=st){var yy=Math.abs(yv)<st/1000?0:yv;g+='<line class="gl" x1="'+pl+'" y1="'+f1(sy(yy))+'" x2="'+(W-pr)+'" y2="'+f1(sy(yy))+'"/><text class="tx" x="'+(pl-5)+'" y="'+f1(sy(yy)+4)+'" text-anchor="end">'+fmtS(yy)+'</text>';}
+  g+='<line class="ax" x1="'+f1(sx(0))+'" y1="'+pt+'" x2="'+f1(sx(0))+'" y2="'+(H-pb)+'"/><line class="ax" x1="'+pl+'" y1="'+f1(sy(0))+'" x2="'+(W-pr)+'" y2="'+f1(sy(0))+'"/>';
+  var A=Math.max(Math.min(a,b),X0),B=Math.min(Math.max(a,b),X1);
+  if(isFinite(A)&&isFinite(B)&&B>A){
+    var pts=[],K=60;
+    for(i=0;i<=K;i++){var xx=A+(B-A)*i/K;pts.push(f1(sx(xx))+','+f1(sy(ep(co,xx))));}
+    g+='<polygon points="'+f1(sx(A))+','+f1(sy(0))+' '+pts.join(' ')+' '+f1(sx(B))+','+f1(sy(0))+'" fill="var(--c-calc)" fill-opacity="0.2"/>';
+  }
+  var path=function(ys,col,wd,dash){var d='',pen=false;ys.forEach(function(v,k){if(!isFinite(v)){pen=false;return;}d+=(pen?'L':'M')+f1(sx(xs[k]))+' '+f1(sy(v))+' ';pen=true;});return '<path d="'+d+'" fill="none" stroke="var('+col+')" stroke-width="'+wd+'" stroke-linejoin="round"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>';};
+  g+=path(dy,'--c-trig',2.2,'7 5')+path(fy,'--c-calc',3);
+  g+='<text class="tx" x="'+(W-pr-4)+'" y="'+(pt+12)+'" text-anchor="end" style="fill:var(--c-calc);font-weight:700">f(x)</text><text class="tx" x="'+(W-pr-4)+'" y="'+(pt+27)+'" text-anchor="end" style="fill:var(--c-trig);font-weight:700">f′(x)</text>';
+  $('cplot').innerHTML=g;
+}
+function calcCalc(){
+  var r=$('calc-res'),co;
+  try{co=parsePoly($('cf').value);}catch(e){r.innerHTML=err(e.message);$('cplot').innerHTML='';return;}
+  var x0=val('cx0'),a=val('ca'),b=val('cb');
+  var dco=[],ico=[0],k;
+  for(k=1;k<co.length;k++)dco.push(co[k]*k);
+  if(!dco.length)dco=[0];
+  for(k=0;k<co.length;k++)ico.push(co[k]/(k+1));
+  var rows='<div class="ans">'+M("f(x) = "+polyHTML(co))+'</div>'+
+    '<div class="kv" style="margin-top:10px">'+
+    '<div style="grid-column:1/-1"><small>مشتق</small><b>'+M("f′(x) = "+polyHTML(dco))+'</b></div>'+
+    '<div style="grid-column:1/-1"><small>انتگرال نامعین</small><b>'+M('∫f(x)dx = '+polyHTML(ico,' + C'))+'</b></div>';
+  if(!isNaN(x0))rows+='<div><small>مقدار تابع در x = '+fmt(x0)+'</small><b>'+M(fmtF(ep(co,x0)))+'</b></div><div><small>شیب (مشتق) در همان نقطه</small><b>'+M(fmtF(ep(dco,x0)))+'</b></div>';
+  if(!isNaN(a)&&!isNaN(b)){var I=ep(ico,b)-ep(ico,a);rows+='<div style="grid-column:1/-1"><small>انتگرال معین از '+fmt(a)+' تا '+fmt(b)+' (ناحیهٔ رنگی روی نمودار)</small><b>'+M(fmtF(I))+'</b></div>';}
+  r.innerHTML=rows+'</div>';
+  plot(co,dco,isNaN(a)?NaN:a,isNaN(b)?NaN:b);
+}
+
+/* ---------- ترکیبیات ---------- */
+function bigFmt(v){
+  var s=v.toString();
+  if(s.length<=22)return fmt(v);
+  return fa(s[0])+'٫'+fa(s.slice(1,6))+' × ۱۰<sup>'+fa(s.length-1)+'</sup> ('+fa(s.length)+' رقمی)';
+}
+function bfact(n){var r=1n;for(var i=2n;i<=BigInt(n);i++)r*=i;return r;}
+function ncr(n,r){r=Math.min(r,n-r);var res=1n;for(var i=1;i<=r;i++)res=res*BigInt(n-r+i)/BigInt(i);return res;}
+function npr(n,r){var res=1n;for(var i=0;i<r;i++)res*=BigInt(n-i);return res;}
+function calcComb(){
+  var n=val('cn'),r0=val('cr'),el=$('comb-res');
+  if(!Number.isInteger(n)||n<0||n>1000||!Number.isInteger(r0)||r0<0||r0>n){el.innerHTML=err('n باید صحیح بین ۰ تا ۱۰۰۰ و r صحیح بین ۰ و n باشد.');return;}
+  el.innerHTML='<div class="kv"><div style="grid-column:1/-1"><small>'+M('n!')+' فاکتوریل n</small><b>'+M(bigFmt(bfact(n)))+'</b></div>'+
+    '<div style="grid-column:1/-1"><small>جایگشت '+M('P(n,r) = n! ÷ (n−r)!')+'</small><b>'+M(bigFmt(npr(n,r0)))+'</b></div>'+
+    '<div style="grid-column:1/-1"><small>ترکیب '+M('C(n,r) = n! ÷ (r!(n−r)!)')+'</small><b>'+M(bigFmt(ncr(n,r0)))+'</b></div></div>';
+}
+function calcFib(){
+  var n=val('fn'),el=$('fib-res');
+  if(!Number.isInteger(n)||n<1||n>90){el.innerHTML=err('تعداد جمله‌ها باید صحیح بین ۱ تا ۹۰ باشد.');return;}
+  var a=0n,b=1n,list=[];
+  for(var i=0;i<n;i++){list.push(a);var t=a+b;a=b;b=t;}
+  var ratio=n>=3&&list[n-2]>0n?Number(list[n-1])/Number(list[n-2]):null;
+  el.innerHTML='<div class="tags">'+list.map(function(v){return '<span>'+fmt(v)+'</span>';}).join('')+'</div>'+
+    (ratio?'<p class="sub">نسبت دو جملهٔ آخر '+M(fmt(ratio))+' است و به نسبت طلایی نزدیک می‌شود.</p>':'');
+}
+function calcBase(){
+  var el=$('base-res'),base=parseInt($('bb').value,10),s=norm($('bv').value).trim().toLowerCase();
+  var digits='0123456789abcdef'.slice(0,base);
+  var okd=s.length>0&&s.split('').every(function(ch){return digits.indexOf(ch)>-1;});
+  if(!okd){el.innerHTML=err('این عدد در مبنای '+fmt(base)+' معتبر نیست. رقم‌های مجاز: '+M(digits.toUpperCase().split('').join(' '))+'.');return;}
+  var v=parseInt(s,base);
+  if(v>Number.MAX_SAFE_INTEGER){el.innerHTML=err('عدد بیش از حد بزرگ است.');return;}
+  var tile=function(l,t){return '<div><small>'+l+'</small><b>'+M(t)+'</b></div>';};
+  el.innerHTML='<div class="kv">'+tile('مبنای ۲',v.toString(2))+tile('مبنای ۸',v.toString(8))+tile('مبنای ۱۰',fmt(v))+tile('مبنای ۱۶',v.toString(16).toUpperCase())+'</div>';
+}
+
+/* ---------- ساختار صفحه ---------- */
+var SEC=[
+  {id:'arith',n:'حساب',g:'÷',t:'حساب و اعداد',s:'ماشین‌حساب، درصد، ب.م.م، ک.م.م و عوامل اول'},
+  {id:'alg',n:'جبر',g:'x',t:'جبر',s:'معادلهٔ درجه اول و دوم و دستگاه دو معادله، با مراحل حل'},
+  {id:'geo',n:'هندسه',g:'△',t:'هندسه',s:'مساحت، محیط و حجم شکل‌ها و قضیهٔ فیثاغورس'},
+  {id:'trig',n:'مثلثات',g:'θ',t:'مثلثات',s:'نسبت‌های مثلثاتی روی دایرهٔ واحد'},
+  {id:'stat',n:'آمار',g:'σ',t:'آمار',s:'میانگین، میانه، نما، واریانس و انحراف معیار'},
+  {id:'calc',n:'حسابان',g:'∫',t:'حسابان',s:'مشتق، انتگرال و نمودار چندجمله‌ای'},
+  {id:'comb',n:'ترکیبیات',g:'!',t:'ترکیبیات و مبنا',s:'فاکتوریل، جایگشت، ترکیب، فیبوناچی و تبدیل مبنا'}
+];
+function show(id){
+  SEC.forEach(function(s){
+    var on=s.id===id;$('p-'+s.id).hidden=!on;
+    var t=$('tab-'+s.id);t.setAttribute('aria-selected',on?'true':'false');t.tabIndex=on?0:-1;
+  });
+  var s=SEC.filter(function(x){return x.id===id;})[0],h=$('phead');
+  h.className='phead t-'+id;
+  h.innerHTML='<span class="big" aria-hidden="true">'+s.g+'</span><div><h2>'+s.t+'</h2><p>'+s.s+'</p></div>';
+  try{history.replaceState(null,'','#'+id);}catch(e){}
+}
+function init(){
+  var tabs=$('tabs');
+  tabs.innerHTML=SEC.map(function(s){return '<button type="button" role="tab" class="tab t-'+s.id+'" id="tab-'+s.id+'" aria-controls="p-'+s.id+'" aria-selected="false"><span class="g" aria-hidden="true">'+s.g+'</span>'+s.n+'</button>';}).join('');
+  SEC.forEach(function(s){$('tab-'+s.id).addEventListener('click',function(){show(s.id);});});
+  tabs.addEventListener('keydown',function(e){
+    var k=e.key;if(k!=='ArrowLeft'&&k!=='ArrowRight')return;
+    var idx=SEC.map(function(s){return s.id;}).indexOf(document.activeElement.id.replace('tab-',''));
+    if(idx<0)return;
+    idx=(idx+(k==='ArrowLeft'?1:-1)+SEC.length)%SEC.length;
+    show(SEC[idx].id);$('tab-'+SEC[idx].id).focus();e.preventDefault();
+  });
+
+  $('keys').innerHTML=KEYS.map(function(k){return '<button type="button" class="'+(k[2]||'')+'" data-k="'+k[1]+'" aria-label="'+k[0]+'">'+k[0]+'</button>';}).join('');
+  $('keys').addEventListener('click',function(e){var b=e.target.closest('button');if(b)ins(b.getAttribute('data-k'));});
+  $('ex').addEventListener('keydown',function(e){if(e.key==='Enter')calcEx();});
+  bind(['ex','angle'],calcEx);
+  bind(['pm','pa','pb'],calcPct);
+  bind(['gl'],calcGcd);
+  bind(['pf'],calcPf);
+  bind(['la','lb','lc'],calcLin);
+  bind(['qa','qb','qc'],calcQuad);
+  bind(['s1a','s1b','s1c','s2a','s2b','s2c'],calcSys);
+
+  var gs=$('gs');gs.innerHTML=Object.keys(SH).map(function(k){return '<option value="'+k+'">'+SH[k].n+'</option>';}).join('');
+  gs.addEventListener('change',buildShape);$('gf').addEventListener('input',calcShape);buildShape();
+  bind(['pym','pya','pyb'],calcPy);
+
+  $('tchips').innerHTML=[0,30,45,60,90,120,180,270,360].map(function(d){return '<button type="button" data-d="'+d+'">'+fa(d)+'°</button>';}).join('');
+  $('tchips').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;$('tu').value='d';$('ta').value=b.getAttribute('data-d');calcTrig();});
+  bind(['ta','tu'],calcTrig);
+  bind(['ivf','ivv'],calcInv);
+  bind(['sl'],calcStat);
+  bind(['cf','cx0','ca','cb'],calcCalc);
+  bind(['cn','cr'],calcComb);
+  bind(['fn'],calcFib);
+  bind(['bv','bb'],calcBase);
+
+  var h='';try{h=(location.hash||'').slice(1);}catch(e){}
+  show(SEC.some(function(s){return s.id===h;})?h:'arith');
+}
+init();
+})();
+</script>
+
+</body></html>
